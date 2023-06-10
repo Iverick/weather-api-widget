@@ -3,7 +3,7 @@ import axios from "axios"
 // http://api.weatherapi.com/v1/forecast.json
 export default async (req, res) => {
   try {
-    let city = "Dublin"
+    const city = req.query.city
     const weather = await axios.get(`http://api.weatherapi.com/v1/forecast.json?key=${process.env.WEATHER_API_KEY}&q=${city}&days=10`)  
     const data = weather.data
     return res.status(200).json({ message: "Sent successfully", mainData: data })
