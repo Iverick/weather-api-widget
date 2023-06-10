@@ -1,3 +1,4 @@
+import { converter } from '@/utils/converter'
 import axios from 'axios'
 import { useState } from 'react'
 
@@ -6,11 +7,14 @@ export default function Home() {
   const [currentCity, setCurrentCity] = useState({
     name: "", weather: "", temp: "", pressure: "", humidity: "", wind: "", date: "", temp_f: "", wind_mile: ""
   })
+  const [weatherForecastArray, setWeatherForecastArray] = useState([])
 
   const fetchWeather = async () => {
     try {
       const { data } = await axios.get(`/api/weather?city=${city}`)
       const { mainData } = data
+
+      console.log("Data: ", mainData)
 
       setCurrentCity({
         ...currentCity,
@@ -24,6 +28,7 @@ export default function Home() {
         wind_mile: mainData.current.wind_mph,
         date: mainData.current.last_updated,
       })
+      setWeatherForecastArray(mainData.forecast.forecastday)
     } catch (err) {
       console.log("Error occured while fetching weather data", err.message)
     }
@@ -53,6 +58,29 @@ export default function Home() {
         <h3 className="text-sm my-2">Humidity: <span className="font-bold m-2">{ currentCity.humidity }</span></h3>
         <h3 className="text-sm my-2">Wind: <span className="font-bold m-2">{ currentCity.wind }</span></h3>
         <h3 className="text-sm my-2">Date: <span className="font-bold m-2">{ currentCity.date }</span></h3>
+      </div>
+      <div className="m-6 font-bold">Weather Forecast: </div>
+      <div className="grid sm:grid-cols-3 sm:m-4 grid-cols-1 gap-4 p-2">
+        {weatherForecastArray.map((value, index) => {
+          if (index > 0) {
+            return (
+              <div key={index} className="bg-orange-100 rounded-md shadow-md p-6">
+                <h4>
+                  Day: <span className="font-bold m-2">{converter(weatherForecastArray[index].date)}</span>
+                </h4>
+                <h4>
+                  Weather: <span className="font-bold m-2">{weatherForecastArray[index].day.condition.text}</span>
+                </h4>
+                <h4>
+                  Min: <span className="font-bold m-2">{weatherForecastArray[index].day.mintemp_c}</span>
+                </h4>
+                <h4>
+                  Max: <span className="font-bold m-2">{weatherForecastArray[index].day.maxtemp_c}</span>
+                </h4>
+              </div>
+            )
+          }
+        })}
       </div>
     </div>
   )
